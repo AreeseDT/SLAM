@@ -38,6 +38,7 @@ Partial Class SettingsForm
         Me.GroupBox3 = New System.Windows.Forms.GroupBox()
         Me.ChangeRelayButton = New System.Windows.Forms.Button()
         Me.GroupBox2 = New System.Windows.Forms.GroupBox()
+        Me.StartMinimizedCheckBox = New System.Windows.Forms.CheckBox()
         Me.MinimizeToSysTrayCheckBox = New System.Windows.Forms.CheckBox()
         Me.HoldToPlay = New System.Windows.Forms.CheckBox()
         Me.ConTagsCheckBox = New System.Windows.Forms.CheckBox()
@@ -71,7 +72,7 @@ Partial Class SettingsForm
         'ToolStripStatusLabel1
         '
         Me.ToolStripStatusLabel1.Name = "ToolStripStatusLabel1"
-        Me.ToolStripStatusLabel1.Size = New System.Drawing.Size(48, 17)
+        Me.ToolStripStatusLabel1.Size = New System.Drawing.Size(49, 17)
         Me.ToolStripStatusLabel1.Text = "Version:"
         '
         'VersionLabel
@@ -219,14 +220,24 @@ Partial Class SettingsForm
         Me.GroupBox2.TabStop = False
         Me.GroupBox2.Text = "Other"
         '
+        'StartMinimizedCheckBox
+        '
+        Me.StartMinimizedCheckBox.AutoSize = True
+        Me.StartMinimizedCheckBox.Location = New System.Drawing.Point(6, 180)
+        Me.StartMinimizedCheckBox.Name = "StartMinimizedCheckBox"
+        Me.StartMinimizedCheckBox.Size = New System.Drawing.Size(96, 17)
+        Me.StartMinimizedCheckBox.TabIndex = 13
+        Me.StartMinimizedCheckBox.Text = "Start minimized"
+        Me.StartMinimizedCheckBox.UseVisualStyleBackColor = True
+        '
         'MinimizeToSysTrayCheckBox
         '
         Me.MinimizeToSysTrayCheckBox.AutoSize = True
         Me.MinimizeToSysTrayCheckBox.Location = New System.Drawing.Point(6, 157)
         Me.MinimizeToSysTrayCheckBox.Name = "MinimizeToSysTrayCheckBox"
-        Me.MinimizeToSysTrayCheckBox.Size = New System.Drawing.Size(143, 17)
+        Me.MinimizeToSysTrayCheckBox.Size = New System.Drawing.Size(133, 17)
         Me.MinimizeToSysTrayCheckBox.TabIndex = 12
-        Me.MinimizeToSysTrayCheckBox.Text = "Minimize To System Tray"
+        Me.MinimizeToSysTrayCheckBox.Text = "Minimize to system tray"
         Me.MinimizeToSysTrayCheckBox.UseVisualStyleBackColor = True
         '
         'HoldToPlay
@@ -330,7 +341,7 @@ Partial Class SettingsForm
         Me.Controls.Add(Me.TabControl1)
         Me.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedToolWindow
         Me.Name = "SettingsForm"
-        Me.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen
+        Me.StartPosition = System.Windows.Forms.FormStartPosition.CenterParent
         Me.Text = "Settings"
         Me.StatusStrip1.ResumeLayout(False)
         Me.StatusStrip1.PerformLayout()
