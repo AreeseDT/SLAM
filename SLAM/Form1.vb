@@ -176,19 +176,19 @@ Public Class Form1
     End Sub
 
     Private Sub YTButton_Click(sender As Object, e As EventArgs) Handles YTButton.Click
-        If File.Exists("NAudio.dll") AndAlso File.Exists("Newtonsoft.Json.dll") AndAlso File.Exists("YoutubeExtractor.dll") Then
+        If File.Exists("NAudio.dll") AndAlso File.Exists("libvideo.dll") AndAlso File.Exists("NReco.VideoConverter.dll") Then
             DisableInterface()
             Dim YTImporter As New YTImport
             If YTImporter.ShowDialog() = DialogResult.OK Then
                 ProgressBar1.Maximum = 1
-                Dim WorkerPassthrough() As Object = {GetCurrentGame(), New String() {YTImporter.file}, True}
+                Dim WorkerPassthrough() As Object = {GetCurrentGame(), New String() {YTImporter.VideoFile}, True}
                 WavWorker.RunWorkerAsync(WorkerPassthrough)
             Else
                 EnableInterface()
             End If
 
         Else
-            MessageBox.Show("You are missing either NAudio.dll, Newtonsoft.Json.dll, or YoutubeExtractor.dll! Cannot import from YouTube without them!", "Missing File(s)", MessageBoxButtons.OK, MessageBoxIcon.Error)
+            MessageBox.Show("You are missing either NAudio.dll, libvideo.dll, or NReco.VideoConverter.dll! Cannot import from YouTube without them!", "Missing File(s)", MessageBoxButtons.OK, MessageBoxIcon.Error)
         End If
     End Sub
 
@@ -567,7 +567,7 @@ Public Class Form1
                 Thread.Sleep(Game.PollInterval)
 
             Catch ex As Exception
-                If Not ex.HResult = -2147024864 Then '-2147024864 = "System.IO.IOException: The process cannot access the file because it is being used by another process."
+                If Not ex.HResult = -2147024864 Then '-2147024864 = "System.IO.IOException: The process cannot access the VideoFile because it is being used by another process."
                     LogError(ex)
                     e.Result = ex
                     Return

@@ -1,10 +1,13 @@
 ﻿Imports System.ComponentModel
 Imports System.IO
 Imports System.Text.RegularExpressions
-Imports YoutubeExtractor
+Imports VideoLibrary
+Imports NReco.VideoConverter
+
 Public Class YTImport
 
-    Public file As String
+    Public VideoFile As String
+
     Sub ProgressChangedHandler(sender, args)
         Console.WriteLine(args.ProgressPercentage)
     End Sub
@@ -26,40 +29,32 @@ Public Class YTImport
 
     Private Sub DownloadWorker_DoWork(sender As Object, e As System.ComponentModel.DoWorkEventArgs) Handles DownloadWorker.DoWork
         Try
-            Dim videoInfos As IEnumerable(Of VideoInfo) = DownloadUrlResolver.GetDownloadUrls(e.Argument).OrderBy(Function(vid) vid.Resolution)
-
-            Dim video As VideoInfo = videoInfos.First(Function(info) info.AdaptiveType = AdaptiveType.Audio AndAlso info.AudioType = AudioType.Aac OrElse info.AdaptiveType = AdaptiveType.None AndAlso info.VideoType = VideoType.Mp4 AndAlso info.AudioBitrate >= 128)
-            If IsNothing(video) Then
-                If videoInfos.Any(Function(info) info.AdaptiveType = AdaptiveType.None AndAlso info.VideoType = VideoType.Mp4) Then
-                    video = videoInfos.First(Function(info) info.AdaptiveType = AdaptiveType.None AndAlso info.VideoType = VideoType.Mp4)
-                Else
-                    Throw New System.Exception("Could not find download.")
-                End If
-            End If
-
-            If video.RequiresDecryption Then
-                DownloadUrlResolver.DecryptDownloadUrl(video)
-            End If
-
-
             If Not Directory.Exists(Path.GetFullPath("temp\")) Then
                 Directory.CreateDirectory(Path.GetFullPath("temp\"))
             End If
 
-            Dim filename As String = String.Join("", video.Title.Split(Path.GetInvalidFileNameChars()))
+            'Use the highest audio quality download
+            Dim video = YouTube.Default.GetAllVideos(e.Argument).Where(Function(v) Not v.AudioFormat = AudioFormat.Unknown).OrderByDescending(Function(v) v.AudioBitrate).First()
 
-            Dim VideoDownloader = New VideoDownloader(video, Path.GetFullPath("temp\" & filename & video.VideoExtension))
+            Dim videoDownloadFile As String = Path.GetFullPath("temp\" & String.Join("", video.Title.Split(Path.GetInvalidFileNameChars())) & video.FileExtension)
 
-            AddHandler VideoDownloader.DownloadProgressChanged, Sub(send, args) DownloadWorker.ReportProgress(Convert.ToInt32(args.ProgressPercentage))
+            File.WriteAllBytes(videoDownloadFile, video.GetBytes())
 
-            VideoDownloader.Execute()
+            'Some of the downloads are in .webm format, this converts them
+            If video.FileExtension IsNot ".mp4" Then
+                Dim convert As New FFMpegConverter()
+                Dim convertedVideoFile As String = Path.GetFullPath("temp\" & String.Join("", video.Title.Split(Path.GetInvalidFileNameChars())) & ".mp4")
+                convert.ConvertMedia(videoDownloadFile, convertedVideoFile, Format.mp4)
+                videoDownloadFile = convertedVideoFile
+            End If
 
-            e.Result = Path.GetFullPath("temp\" & filename & video.VideoExtension)
+            e.Result = videoDownloadFile
         Catch ex As Exception
             Form1.LogError(ex)
 
             e.Result = ex
         End Try
+
     End Sub
 
     Private Sub DownloadWorker_ProgressChanged(sender As Object, e As ProgressChangedEventArgs) Handles DownloadWorker.ProgressChanged
@@ -70,7 +65,7 @@ Public Class YTImport
         If e.Result.GetType = GetType(Exception) Then
             MessageBox.Show(e.Result.Message & " See errorlog.txt for more info.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error)
         Else
-            file = e.Result
+            VideoFile = e.Result
             DialogResult = Windows.Forms.DialogResult.OK
         End If
     End Sub
